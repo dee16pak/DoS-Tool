@@ -113,11 +113,11 @@ def execute_bl(pos, parsed_code, stack, memory, storage, symbolic, curr_block, l
                         if is_bv_value(simplify(condz['z3'])):
                             if 'z1' in condz and 'z2' in condz and is_bv_value(simplify(condz['z1'])) and is_bv_value(simplify(condz['z2'])):
                                 # print(simplify(condz['z3']))
-                                if simplify(condz['z1']).as_long() <= 10000 and simplify(condz['z2']).as_long() <= 10000 and basic_block.check_in_loop(curr_block, loops) and loop_patterns.check_loop_exit(curr_block, pos+1, loops):
+                                if simplify(condz['z1']).as_long() <= 10000 and simplify(condz['z2']).as_long() <= 10000 and basic_block.check_in_loop(curr_block, loops):
                                     execute_bl(pos + 1, parsed_code, stack2, memory2, storage, symbolic2, curr_block, loops, path_len, v2, v_data2, visited, adjancy_list, caller2, external_fun_list, path_from_ext_fun2)
                                     i = i + 1
                                 else:
-                                    break
+                                    i = i + 1
                             else:
                                 s.push()
                                 s.add(simplify(condz['z3']) != 0)

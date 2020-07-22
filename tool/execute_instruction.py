@@ -720,7 +720,7 @@ def execute_instruction(parsed_code,pos, stack, memory, storage, symbolic, calle
         l = l - 2
 
         while l > 0:
-            print(l)
+            # print(l)
             stack.append(args[l])
             l = l - 1
         stack.append(args[-1])

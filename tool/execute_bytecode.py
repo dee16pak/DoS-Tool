@@ -1,5 +1,5 @@
 from parse_bytecode import parse, separate_runtime_code
-from loop_patterns import check_infinite
+# from loop_patterns import check_infinite
 from execute_block import execute_bl
 import globals_var
 import sys
