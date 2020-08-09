@@ -1,0 +1,111 @@
+To test tool I have taken 35 smart contracts. These are mix of self made and onchain smart contracts
+
+6 smart contracts were coded by me for testing different test cases:
+
+1. Normal send
+
+function send(address _receiver) payable {
+    _receiver.send(msg.value);
+}
+
+Here an external user calls "send" function and have to provide address "_receiver" as an argument.
+But this address is called within the function. As this address can be provided by attacker this 
+could lead to a call where a malicious contract is called.
+
+
+2. Constant Loop Contracts
+
+function print() public view returns (uint256){
+        uint256 temp = 0;
+        for(uint256 i = 0; i < 1000; i++){
+            temp++;
+        }
+        
+        for(i = 0; i < balances.length; i++){
+            temp += balances[i];
+        }
+        return temp;
+} 
+
+This is the design choice number 3 as explained in the thesis. Because of the constant loop above and
+max_pathlength set, we cannot traverse a path which could lead to the second loop(vulnerable loop) with
+balances.length as loop condition.
+
+
+3. dynamic_array_argument
+
+function print(uint [] user) public onlyowner view returns (uint256){
+        uint256 temp = 0;
+        for(uint256 i = 0; i < user.length; i++){
+            temp += 1;
+        }
+    	return temp;
+}
+
+Here we loop over an array length where number of elements in the array is decided by the external user.
+
+
+#########################################################################################################
+The Tool also considered modifiers
+
+4. Normal send with faulty modifier
+
+contract BasicToken {
+  
+    address owner;
+     uint256[] balances;
+      
+      constructor(address o) public {
+        owner = o;
+      }
+    
+    function addowner(address a) external{
+        owner = a;
+    }
+    modifier onlyowner(){
+        if(msg.sender != owner) throw;
+        _;
+    }
+    
+    
+   function send() payable onlyowner{
+    owner.send(msg.value);
+  }
+}
+
+Here function "send" can be called by onlyowner. Therefore the send should be safe. But onlyowner itself can be
+changed by external users using "addowner". Hence owner is not fixed and can be changed by any malicious user.
+
+
+Last two are smart contracts are also for some more modifier related cases.
+
+##############################################################################################################
+
+1 smart contract is having the kingofether smart contract's malicious code
+
+contract Auction {
+    address currentLeader;
+    uint highestBid;
+
+    function bid() payable {
+        require(msg.value > highestBid);
+
+        require(currentLeader.send(highestBid)); // Refund the old leader, if it fails then revert
+
+        currentLeader = msg.sender;
+        highestBid = msg.value;
+    }
+}
+
+##############################################################################################################
+
+And remaining 28 smart contracts are on-chain random smart contracts. These 28 smart contracts are such that they
+are also found on etherscan.io as well and therefore source code is available to cross check the accuracy of the tool
+Without source codes of on-chain smart contract it is hard to check correctness of vulnerability in the the smart
+contract. 
+
+
+####################################################################################################################
+####################################################################################################################
+
+

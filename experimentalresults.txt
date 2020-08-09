@@ -1,0 +1,51 @@
+We are searching all paths in a program which are symbolically feasible to access using DFS approach. 
+But these path lengths could be of any lengths. Also if the program falls in infinite loops then it is
+impossible to terminate the program because the path will continue forever. That's why the tool stops searching 
+a path after max_pathlength is reached and starts exploring the next path. 
+
+Also we have explained why max_invocation is necessary because some vulnearbilities are triggered by setting multiple
+functions and hence their order is necessary to capture the vulnerabilities. But this is not possible with one 
+invocation hence we tested for multiple invocations.
+
+Now instead of multiple invocation we could have used different permutations of functions in which we could have run
+the tool because at the end vulnerability is present in one of the permutation. This can be understood with an example
+
+Suppose a program contains three external functions: A B C
+Now there are 6 permutations in which these functions can be triggered.
+A then B then C
+A then C then B
+B then A then C
+B then C then A
+C then A then B
+C then B then A
+
+And suppose only one permutation is able to triggered the vulnerabilities. Hence we have to run the tool for all
+permutations in order to find that one vulnerable permutation. But this approach is highly inefficient because
+if we have 5 functions then permutations will reache 120 and if we have 6 functions permuations will reach 720.
+Now running tool these many time is highly in efficient.
+
+But there is a catch. If a smart contract's vulnerabilities is triggered using more than one function then there
+are multiple invocations of smart contract. This means that the these functions changes the state of a smart contract
+which is permanent between invocations. That is why the next function results changes based on previous function.
+
+Hence we can run the same permutation of functions (A B C) of the above example 3 times. Suppose C A B is the
+vulnerability permutation. On executing the permutation (A B C), when C function executes it changes the state of 
+smart contract which will be permanent. In the next invocation this state will be used by function A to set some 
+more variables/states and in the last invocation finally on executing the function B, tool will catch vulnerabilities.
+
+Hence instead of running tool for all permutation which is highly not feasible we used multiple invocations.
+
+
+Now the tool should be able to find more vulnerabilities when these 2 arguments, i.e., max_pathlength and max_invocation
+are increased because by increasing max_pathlength we are searching more deeper for a vulnerability in a path and by
+increasing max_invocation we are covering more vulnerabilities which can be triggered by using multiple functions invocation.
+
+
+The result are also showing the same trend. We have used two graphs one is with single invocation and increasing max_pathlength.
+Second is with 2 invocation and increasing max_pathlength. We were able to found vulnerabilites more as we increase these variables
+more paths and ways in the program by which vulnerabilities can be found.
+
+Note : I have used a basic machine and hence and so used small arguments such as max_invocations. But max_pathlength 60-70 and max_invoactions 1-10 is par to check
+in a program. This tool might take long time with small machine configurations but will work fine if configurations will be increased.
+The configurations increament will also depend on smart contract to smart contract because some smart contracts have less paths to explore
+and some have high.
